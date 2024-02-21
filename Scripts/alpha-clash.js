@@ -11,8 +11,16 @@
 //     playGround.classList.remove('hidden');
 
 // }
+const audio = new Audio();
+let isGamePlayOn = false;
+const artBoard = document.getElementById('art-board');
+const modalBox = document.getElementById('modal-box');
 function handleKeyboardButtonPress(event)
 {
+    if(isGamePlayOn === false)
+    {
+        return;
+    }
     const playerPressed = event.key;
 
 
@@ -21,9 +29,9 @@ function handleKeyboardButtonPress(event)
     {
         gameOver();
     }
-    if(playerPressed === 'Enter')
+    else if(playerPressed === 'Enter')
     {
-        play();
+        console.log("clicked");
     }
 
     //get expected to press
@@ -31,11 +39,12 @@ function handleKeyboardButtonPress(event)
     const currentAlphabet = getElementTextById("current-alphabet");
 
     const expectedAlphabet = currentAlphabet.toLowerCase();
-    console.log(playerPressed , expectedAlphabet);
+    // console.log(playerPressed , expectedAlphabet);
 
     if(playerPressed === expectedAlphabet)
     {
-      
+      audio.src = "../audio/Success.mp3";
+      audio.play();
 
         // //step-1 : get the current score
         // const currentScoreElement = document.getElementById('current-score');
@@ -65,6 +74,10 @@ function handleKeyboardButtonPress(event)
     }
     else
     {
+        audio.src = "../audio/Wrong.mp3"
+        audio.play();
+
+        
         // console.log('You lost a life')
 
         //step-1 : get the current life
@@ -86,11 +99,15 @@ function handleKeyboardButtonPress(event)
 
         
 
-
+        
 
         //using function
         const currentLife = getValueById("current-life");
         const updatedLife = currentLife-1;
+
+        const updatedLifPercentage = (updatedLife / 5) * 100;
+        artBoard.style.background = `linear-gradient(#FFFFFFB3 ${updatedLifPercentage}% , red)`
+
         setValueById('current-life' , updatedLife);
 
         if(updatedLife === 0)
@@ -121,7 +138,7 @@ function continueGame()
     //step-1 : generate a random alphabet
    
     const alphabet =  getARandomAlphabet();
-    console.log('Your random alphabet : ' ,alphabet)
+    // console.log('Your random alphabet : ' ,alphabet)
 
     //set randomly generated alphabet to the screen (show it)
 
@@ -139,6 +156,7 @@ function continueGame()
 
 function play()  //using external function
 {
+    isGamePlayOn = true;
     //hide everything show only the playground
     hideElementById('home-screen');
     hideElementById('score');
@@ -149,10 +167,15 @@ function play()  //using external function
     setValueById('current-life' , 5);
     setValueById('current-score' , 0);
     continueGame()
+
+    
 }
 
 function gameOver()
 {
+    isGamePlayOn = false;
+    audio.src = "../audio/GameOver.mp3";
+    audio.play();
     hideElementById('play-ground');
     showElementById('score');
 
@@ -163,4 +186,20 @@ function gameOver()
 
     const currentAlphabet = getElementTextById('current-alphabet');
     removeBackgroundColorById(currentAlphabet);
+
+    artBoard.style.background = `linear-gradient(#FFFFFFB3 100% , red)`
 }
+
+function modalOpen (event)
+{
+    if(event.clientY < 5)
+    {
+        modalBox.style.display = "flex";
+    }
+}
+
+function closeModal()
+{
+    modalBox.style.display = "none";
+}
+document.body.onmousemove = modalOpen;
